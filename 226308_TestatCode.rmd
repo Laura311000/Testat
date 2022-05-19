@@ -1,0 +1,114 @@
+---
+title: "Testat"
+subtitle: "VFB-Kader 21/22"
+author: "lw114"
+date: '2022-05-19'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(igraph)
+```
+
+
+
+```{r Netzwerk einlesen}
+
+# Programmbibliothek laden
+library(igraph)
+
+
+
+# Einlesen der Edge- und Nodelist
+edges <- read.csv("https://raw.githubusercontent.com/Laura311000/Testat/main/TestatEdgelist.csv", header=T, as.is=T, sep = ",")
+
+nodes <- read.csv("https://raw.githubusercontent.com/Laura311000/Testat/main/Testat-Nodelist.csv", header=T, as.is=T, sep = ",")
+
+# Matrix erstellen
+edgematrix <-as.matrix(edges)
+
+# Zusammenführen von Edge- und Nodelist als igraph-Objekt VFB
+ VFB <- graph_from_data_frame(d=edgematrix,directed=F)
+ VFB
+
+
+```
+
+## Datensatz vorbereiten
+
+```{r Netzwerk analysieren, fig.height=6, fig.width=9}
+
+# Einfacher plot
+deg<-degree(VFB, mode = "all")
+V(VFB)$size <-deg
+
+
+plot(VFB,
+     asp=0,
+     layout=layout_nicely,
+     rescale=TRUE,
+     vertex.color="gold",
+     vertex.size=deg,
+     vertex.label=NA,
+     edge.arrow.size=.2,
+     main="Kader VFB",
+     sub="Saison 21/22")
+
+edge.attributes(VFB)$name
+
+# Attribute anzeigen lassen
+list.vertex.attributes(VFB)
+list.edge.attributes(VFB)
+
+
+#der einfache Plot liefert eine Überssicht. Man kann bereits erkennen, das ein Knoten besonders häufig auftritt und deswegen in der Grafik auch größer ist als alle anderen
+
+
+
+```
+
+## Two-Mode Netzwerk
+
+Ein two-mode Netzwerk besteht aus zwei unterschiedlichen Knotentypen,
+üblicherweise Akteure und Organisationen/Event, die über
+Mitgliedschaften definiert sind.
+
+Wenn in der Nodelist das Attribut "type" mit den Werten 1 und 2 vergeben
+ist, lassen sich zusätzlich zur Farbe auch die Form der Knoten anpassen
+(das ist zusätzlich zu der Aufgabe und wird nicht im Testat verlangt:
+ist aber später für Ihr Projekt hilfreich.
+
+```{r Two-Mode Netzwerk erstellen}
+
+# Vertex-Attribute anzeigen lassen
+list.vertex.attributes(VFB)
+
+# Formen für two-Netzwerk festlegen
+#V(VFB)[V(VFB)$type == 1]$shape <- "circle" # Spieler
+#V(VFB)[V(VFB)$type == 2]$shape <- "square" # Verein
+
+# eigentlich wollte ich hier noch den Spielern und dem Verein verschiedene Formen geben, damit man sie im Netzwerk einfacher unterscheiden kann. Das hat jedoch nicht funktioniert :(
+
+```
+
+```{r Netzwerk visualisieren, fig.height=15, fig.width=15}
+
+# Jetzt werde ich das Two-Mode-Netzwerk mit Farben visualisieren
+
+plot(VFB,
+     asp=0,
+     layout=layout_nicely(VFB),
+     rescale=TRUE,
+     vertex.size=degree(VFB)*2,
+     vertex.frame.color="black",
+     vertex.color="aquamarine",
+     edge.color="black",
+     edge.arrow.size=0.2,
+     main="Kader VFB",
+     sub="Saison 21/22")
+
+```
+
+
+#Die Visualisierung des Kaders zeigt die in der Edge- und Nodelist gesammelten Informationen. Besispielsweise lässt sich erkennen dass der Spieler mit der Rückennummer 15 vor seinem Wechsel beim SC Freiburg gespielt hat (wäre er mal lieber dort geblieben) und aus Deutschland kommt. Auf den ersten Blick lässt sich erkennen, dass viele Spieler des aktuellen  Kaders aus Deutschland kommen, da dieser Knoten besonders groß ist.
